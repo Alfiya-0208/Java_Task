@@ -1,0 +1,187 @@
+Project Structure:
+
+attendance-management-system
+|-- pom.xml
+|-- src
+|   |-- main
+|   |   |-- java
+|   |   |   |-- com
+|   |   |   |   |-- attendance
+|   |   |   |   |   |-- controller
+|   |   |   |   |   |-- dao
+|   |   |   |   |   |-- model
+|   |   |   |   |   |-- service
+|   |   |   |   |   |-- util
+|   |   |-- resources
+|   |   |   |-- application.properties
+|   |   |   |-- hibernate.cfg.xml
+|   |   |-- webapp
+|   |   |   |-- WEB-INF
+|   |   |   |   |-- dispatcher-servlet.xml
+|   |   |   |   |-- web.xml
+|   |   |   |-- index.jsp
+|-- test
+|   |-- java
+|   |   |-- com
+|   |   |   |-- attendance
+|   |   |   |   |-- controller
+|   |   |   |   |-- dao
+|   |   |   |   |-- model
+|   |   |   |   |-- service
+|   |   |   |   |-- util
+
+
+Java Code:
+
+Model Classes:
+
+Student.java
+
+@Entity
+@Table(name = "students")
+public class Student {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(name = "name")
+    private String name;
+    
+    @Column(name = "email")
+    private String email;
+    
+    // Getters and setters
+}
+
+
+Attendance.java
+
+@Entity
+@Table(name = "attendance")
+public class Attendance {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @ManyToOne
+    @JoinColumn(name = "student_id")
+    private Student student;
+    
+    @Column(name = "attendance_date")
+    private Date attendanceDate;
+    
+    @Column(name = "present")
+    private Boolean present;
+    
+    // Getters and setters
+}
+
+
+DAO Classes:
+
+StudentDAO.java
+
+@Repository
+public class StudentDAO {
+    
+    @Autowired
+    private SessionFactory sessionFactory;
+    
+    public List<Student> getAllStudents() {
+        Session session = sessionFactory.getCurrentSession();
+        return session.createQuery("FROM Student", Student.class).getResultList();
+    }
+    
+    public Student getStudentById(Long id) {
+        Session session = sessionFactory.getCurrentSession();
+        return session.get(Student.class, id);
+    }
+    
+    public void saveStudent(Student student) {
+        Session session = sessionFactory.getCurrentSession();
+        session.saveOrUpdate(student);
+    }
+    
+    public void deleteStudent(Long id) {
+        Session session = sessionFactory.getCurrentSession();
+        Student student = session.get(Student.class, id);
+        session.delete(student);
+    }
+}
+
+
+AttendanceDAO.java
+
+@Repository
+public class AttendanceDAO {
+    
+    @Autowired
+    private SessionFactory sessionFactory;
+    
+    public List<Attendance> getAllAttendance() {
+        Session session = sessionFactory.getCurrentSession();
+        return session.createQuery("FROM Attendance", Attendance.class).getResultList();
+    }
+    
+    public Attendance getAttendanceById(Long id) {
+        Session session = sessionFactory.getCurrentSession();
+        return session.get(Attendance.class, id);
+    }
+    
+    public void saveAttendance(Attendance attendance) {
+        Session session = sessionFactory.getCurrentSession();
+        session.saveOrUpdate(attendance);
+    }
+    
+    public void deleteAttendance(Long id) {
+        Session session = sessionFactory.getCurrentSession();
+        Attendance attendance = session.get(Attendance.class, id);
+        session.delete(attendance);
+    }
+}
+
+
+Service Classes:
+
+StudentService.java
+
+@Service
+public class StudentService {
+    
+    @Autowired
+    private StudentDAO studentDAO;
+    
+    public List<Student> getAllStudents() {
+        return studentDAO.getAllStudents();
+    }
+    
+    public Student getStudentById(Long id) {
+        return studentDAO.getStudentById(id);
+    }
+    
+    public void saveStudent(Student student) {
+        studentDAO.saveStudent(student);
+    }
+    
+    public void deleteStudent(Long id) {
+        studentDAO.deleteStudent(id);
+    }
+}
+
+
+AttendanceService.java
+
+@Service
+public class AttendanceService {
+    
+    @Autowired
+    private AttendanceDAO attendanceDAO;
+    
+    public List<Attendance> getAllAttendance() {
+        return attendanceDAO.getAllAttendance();
+    }
+    
+    public Attendance getAttendanceById(Long id) {
+        return attendanceDAO.getAttendanceById(id);
